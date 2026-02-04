@@ -9,6 +9,8 @@ on:
   pull_request:
     branches:
       - '**' # Esto activa el job para PRs en CUALQUIER rama
+
+jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
