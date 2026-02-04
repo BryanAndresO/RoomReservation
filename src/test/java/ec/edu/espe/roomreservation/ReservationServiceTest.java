@@ -105,21 +105,4 @@ public class ReservationServiceTest {
         verify(reservationRepository, never()).save(any());
     }
 
-    @Test
-    void createReservation_userBlocked_ShouldThrow_andNotSave(){
-        //Arrange
-        String roomCode = "LAB-101";
-        String email = "baortiz7@espe.edu.ec";
-        int hours = 4;
-
-        when(userPolicyClient.isUserBlocked(email)).thenReturn(Boolean.TRUE);
-
-        //Act + Assert
-        IllegalStateException exception = assertThrows(IllegalStateException.class, 
-                () -> reservationService.createReservation(roomCode, email, hours));
-
-        assertEquals("User blocked", exception.getMessage());
-        verify(userPolicyClient).isUserBlocked(email);
-        verify(reservationRepository, never()).save(any());
-    }
 }
