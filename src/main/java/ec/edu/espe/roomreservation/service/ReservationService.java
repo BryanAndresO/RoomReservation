@@ -43,4 +43,22 @@ public class ReservationService {
         return new ReservationResponse(savedReservation.getId(), savedReservation.getRoomCode(),
                 savedReservation.getReservedByEmail(), savedReservation.getHours(), savedReservation.getStatus());
     }
+
+    //Confirmar una reserva existente
+    public String confirmReservation(String reservationId){
+        //Validaciones
+        if (reservationId == null || reservationId.trim().isEmpty()){
+            throw new IllegalArgumentException("Reservation ID is required");
+        }
+        RoomReservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        
+        if ("CONFIRMED".equals(reservation.getStatus())){
+            throw new IllegalStateException("Reservation already confirmed");
+        }
+        
+        reservation.setStatus("CONFIRMED");
+        reservationRepository.save(reservation);
+        return reservation.getStatus();
+    }
 }

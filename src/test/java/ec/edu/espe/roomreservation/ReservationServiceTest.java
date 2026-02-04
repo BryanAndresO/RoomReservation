@@ -105,4 +105,54 @@ public class ReservationServiceTest {
         verify(reservationRepository, never()).save(any());
     }
 
+    @Test
+    void confirmReservation_validId_ShouldUpdateStatusToConfirmed(){
+        //Arrange
+        RoomReservation reservation = new RoomReservation("123", "LAB-101", "baortiz7@espe.edu.ec", 4, "CREATED");
+        String reservationId = reservation.getId();
+
+        when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(reservation));
+        when(reservationRepository.save(any(RoomReservation.class))).thenAnswer(i -> i.getArgument(0));
+
+        //Act
+        String status = reservationService.confirmReservation(reservationId);
+
+        //Assert
+        assertEquals("CONFIRMED", status);
+        verify(reservationRepository).findById(reservationId);
+        verify(reservationRepository).save(any(RoomReservation.class));
+    }
+
+    @Test
+    void confirmReservation_notFound_ShouldThrow(){
+        //Arrange
+        String reservationId = "no-exist-id";
+
+        when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.empty());
+
+        //Act + Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, 
+                () -> reservationService.confirmReservation(reservationId));
+
+        assertEquals("Reservation not found", exception.getMessage());
+        verify(reservationRepository).findById(reservationId);
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void confirmReservation_alreadyConfirmed_ShouldThrow(){
+        //Arrange
+        RoomReservation reservation = new RoomReservation("123", "LAB-101", "baortiz7@espe.edu.ec", 4, "CONFIRMED");
+        String reservationId = reservation.getId();
+
+        when(reservationRepository.findById(reservationId)).thenReturn(java.util.Optional.of(reservation));
+
+        //Act + Assert
+        IllegalStateException exception = assertThrows(IllegalStateException.class, 
+                () -> reservationService.confirmReservation(reservationId));
+
+        assertEquals("Reservation already confirmed", exception.getMessage());
+        verify(reservationRepository, never()).save(any());
+    }
+
 }
