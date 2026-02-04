@@ -9,6 +9,8 @@ on:
   pull_request:
     branches:
       - '**' # Esto activa el job para PRs en CUALQUIER rama
+
+jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
@@ -20,6 +22,9 @@ on:
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Dar permisos a Gradle
+        run: chmod +x ./gradlew
 
       - name: Ejecutar las pruebas
         run: ./gradlew test
